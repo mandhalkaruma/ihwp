@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌿 Prakriti Analysis System</title>
+<style>
+*{box-sizing:border-box;font-family:'Poppins',sans-serif;}
+body{margin:0;background:#f7fff5;color:#333;}
+
+/* HEADER */
+header{
+  background:#2e7d32;
+  color:#fff;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 40px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.2);
+}
+header .logo{
+  font-size:1.5rem;
+  font-weight:600;
+}
+nav a{
+  color:#fff;
+  text-decoration:none;
+  margin:0 15px;
+  padding:8px 16px;
+  border:1px solid transparent;
+  border-radius:6px;
+  transition:0.3s;
+}
+nav a:hover{
+  background:#fff;
+  color:#2e7d32;
+  border-color:#2e7d32;
+}
+/* Style adjustments for the header buttons */
+#auth-button-container .btn {
+    margin-left: 10px !important;
+}
+
+/* SECTIONS */
+section{display:none;padding:2rem;max-width:900px;margin:auto;text-align:center;}
+.active{display:block;}
+h2{color:#2e7d32;}
+.btn{
+  background:#2e7d32;color:#fff;border:none;padding:10px 25px;
+  border-radius:20px;cursor:pointer;margin-top:20px;transition:0.3s;
+}
+.btn-secondary {
+    background: #7cb342; /* Lighter green for secondary action */
+}
+.btn:hover{background:#388e3c;}
+.btn-secondary:hover { background: #8bc34a; }
+
+input,textarea{
+  width:100%;padding:10px;margin:8px 0;border:1px solid #ccc;border-radius:6px;
+}
+form{text-align:left;}
+.result{
+  background:#e8f5e9;padding:20px;border-radius:10px;margin-top:20px;text-align:left;
+  border: 1px solid #2e7d32; /* Added border for prominence */
+}
+.result h3 { color: #1b5e20; }
+.result ul { list-style-type: disc; margin-left: 20px; }
+
+/* ADMIN DASHBOARD STYLES */
+.dashboard-card {
+    background: #fff8e1; /* Light yellow background */
+    padding: 30px;
+    border-radius: 12px;
+    margin-top: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border-left: 5px solid #ffb300;
+}
+
+/* PRAKRITI DETAILS PAGE - Container for each profile section */
+.profile-card {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    text-align: left;
+}
+.profile-card h2 {
+    border-bottom: 2px solid #a5d6a7;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+.traits {
+  background:#fafafa;padding:20px;border-radius:10px;margin-top:20px;text-align:left;
+}
+.traits h3{color:#1b5e20;}
+
+/* FOOTER */
+footer{
+  background:#2e7d32;color:#fff;text-align:center;padding:10px;margin-top:40px;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🌿 Prakriti Analysis</div>
+  <!-- Main Navigation - Hidden until logged in -->
+  <nav id="main-nav" style="display: none;"> 
+    <a href="#" onclick="showSection('quizSection')">Prakriti Assessment</a>
+    <a href="#" onclick="showSection('detailsSection')">Dosha Profiles</a> <!-- Combined link -->
+    <a id="admin-link" href="#" onclick="showSection('adminDashboardSection')" style="display: none; color: #ffb300;">Admin Dashboard</a>
+  </nav>
+  <!-- Dynamic Button Container for Login/Logout -->
+  <div id="auth-button-container">
+    <!-- Content will be set by JavaScript on load -->
+  </div>
+</header>
+
+<!-- LOGIN (Active by default if no user is found) -->
+<section id="loginSection" class="active">
+  <h2>🔐 User Login</h2>
+  <form>
+    <label>Name:</label>
+    <input type="text" id="loginName" required>
+    <label>Email:</label>
+    <input type="email" id="loginEmail" required>
+    <p id="user-error-message" style="color: red; margin-top: 10px; display: none;">Please enter both your name and email to proceed.</p>
+    <button type="button" class="btn" onclick="loginUser()">Login</button>
+    <p style="margin-top: 20px; text-align: center;">
+        <button type="button" class="btn btn-secondary" onclick="showSection('adminLoginSection')">Admin Access</button>
+    </p>
+  </form>
+</section>
+
+<!-- ADMIN LOGIN SECTION -->
+<section id="adminLoginSection">
+    <h2>🔑 Admin Panel Login</h2>
+    <form>
+        <label>Admin Name:</label>
+        <input type="text" id="adminLoginName" required>
+        <label>Secret Key (Email):</label>
+        <input type="email" id="adminLoginEmail" required>
+        <p id="admin-error-message" style="color: red; margin-top: 10px; display: none;">Invalid credentials. Please check the name and secret key.</p>
+        <button type="button" class="btn" onclick="adminLoginUser()">Access Dashboard</button>
+        <p style="margin-top: 20px; text-align: center;">
+            <button type="button" class="btn btn-secondary" onclick="showSection('loginSection')">Back to User Login</button>
+        </p>
+    </form>
+</section>
+
+<!-- ADMIN DASHBOARD -->
+<section id="adminDashboardSection">
+    <h2>👑 Admin Dashboard</h2>
+    <div class="dashboard-card">
+        <h3>User Management Simulation</h3>
+        <p>This panel gives you exclusive access to manage user data and follow-ups. Since this is a single HTML file without a full backend, the functionality is simulated.</p>
+        <p style="font-weight: 600; color: #d35400;">
+            Currently Logged in as: <span id="currentAdminName"></span>
+        </p>
+        
+        <div style="margin-top: 30px; text-align: left;">
+            <h4>Placeholder Functions:</h4>
+            <ul>
+                <li>View/Edit User Profiles (Data currently in localStorage)</li>
+                <li>Track Quiz Submissions</li>
+                <li>Send Simulated Follow-up Reminders</li>
+            </ul>
+            <p>A full implementation would connect here to a robust database like **Firestore** for real-time user management.</p>
+        </div>
+    </div>
+</section>
+
+<!-- QUIZ -->
+<section id="quizSection">
+  <h2>🪷 Prakriti Analysis Questionnaire</h2>
+  <form id="prakritiForm">
+    <div id="questions"></div>
+    <p id="quiz-error-message" style="color: red; margin-top: 10px; display: none;">Please answer all questions before submitting the analysis!</p>
+    <button type="button" class="btn" onclick="analyzePrakriti()">Submit</button>
+  </form>
+</section>
+
+<!-- RESULT -->
+<section id="resultSection">
+  <h2>📊 Your Prakriti Result</h2>
+  <div id="result" class="result"></div>
+  <div id="dietResult" class="result"></div>
+  <div id="scheduleResult" class="result"></div>
+</section>
+
+<!-- COMBINED PRAKRITI DETAILS PAGE -->
+<section id="detailsSection">
+  <h2 style="text-align: center; margin-bottom: 40px;">Detailed Dosha Profiles</h2>
+
+  <!-- VATA PROFILE -->
+  <div id="vataProfile" class="profile-card">
+    <h2>🌬️ Vata Prakriti</h2>
+    <h3>Dominant Dosha: Vata</h3>
+    <div class="traits">
+      <h3>Physical Characteristics:</h3>
+      <ul>
+        <li>Lean, slender body with dry skin.</li>
+        <li>Fine, frizzy hair and expressive eyes.</li>
+        <li>Flexible joints and quick movements.</li>
+      </ul>
+      <h3>Mental and Emotional Traits:</h3>
+      <ul>
+        <li>Creative, imaginative, and energetic.</li>
+        <li>Prone to anxiety and worry.</li>
+        <li>Quick learner but forgetful.</li>
+      </ul>
+      <h3>Health Tips:</h3>
+      <ul>
+        <li>Eat warm, moist food.</li>
+        <li>Follow a stable daily routine.</li>
+        <li>Avoid skipping meals and cold drinks.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- PITTA PROFILE -->
+  <div id="pittaProfile" class="profile-card">
+    <h2>🔥 Pitta Prakriti</h2>
+    <h3>Dominant Dosha: Pitta</h3>
+    <div class="traits">
+      <h3>Physical Characteristics:</h3>
+      <ul>
+        <li>Moderate build with warm skin tone.</li>
+        <li>Sharp eyes and early greying hair.</li>
+      </ul>
+      <h3>Mental and Emotional Traits:</h3>
+      <ul>
+        <li>Focused, intelligent, and passionate.</li>
+        <li>Can be irritable under stress.</li>
+      </ul>
+      <h3>Health Tips:</h3>
+      <ul>
+        <li>Eat cooling foods like cucumber, coconut.</li>
+        <li>Avoid spicy and fried foods.</li>
+        <li>Practice calm meditation daily.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- KAPHA PROFILE -->
+  <div id="kaphaProfile" class="profile-card">
+    <h2>💧 Kapha Prakriti</h2>
+    <h3>Dominant Dosha: Kapha</h3>
+    <div class="traits">
+      <h3>Physical Characteristics:</h3>
+      <ul>
+        <li>Strong and heavy body with oily skin.</li>
+        <li>Thick hair and stable joints.</li>
+      </ul>
+      <h3>Mental and Emotional Traits:</h3>
+      <ul>
+        <li>Calm, patient, and nurturing.</li>
+        <li>Can become lazy or possessive when imbalanced.</li>
+      </ul>
+      <h3>Health Tips:</h3>
+      <ul>
+        <li>Eat light, spicy, and warm foods.</li>
+        <li>Wake early and stay active.</li>
+        <li>Avoid sweets and dairy.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>© 2025 Prakriti Wellness | Designed with 💚</footer>
+
+<script>
+// --- GLOBAL SIMULATION SETUP ---
+const ADMIN_CREDENTIALS = {
+    name: "AyurvedaAdmin",
+    email: "admin@ayurveda.com" // Use this email to log in as admin
+};
+
+function showSection(id){
+  document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// Helper function to navigate to the combined details page and scroll to the correct section
+function goToProfile(id) {
+    showSection('detailsSection'); // Show the combined section
+    const targetElement = document.getElementById(id);
+    if (targetElement) {
+        // Scroll the target element into view smoothly
+        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+// Function to update the Login/Logout button and navigation visibility
+function updateAuthButton(isLoggedIn, userName, isAdmin = false) {
+    const container = document.getElementById('auth-button-container');
+    const nav = document.getElementById('main-nav');
+    const adminLink = document.getElementById('admin-link');
+
+    nav.style.display = isLoggedIn ? 'flex' : 'none'; // Show nav if any user is logged in
+    
+    if (isLoggedIn) {
+        // Standard user or Admin logout button
+        container.innerHTML = `
+            <span style="margin-right: 10px; color: #fff;">Hello, ${userName}!</span>
+            <button class="btn" onclick="logoutUser()" style="background:#d9534f; margin:0;">Logout</button>
+        `;
+
+        if (isAdmin) {
+            // Admin specific display
+            adminLink.style.display = 'block';
+            showSection('adminDashboardSection'); // Send admin to dashboard
+            document.getElementById('currentAdminName').textContent = userName;
+        } else {
+            // Regular user display
+            adminLink.style.display = 'none';
+            showSection('quizSection'); // Send regular user to quiz/home
+        }
+
+    } else {
+        // Not logged in
+        container.innerHTML = `
+            <button class="btn" onclick="showSection('loginSection')" style="background:#5cb85c; margin:0;">Login</button>
+        `;
+        adminLink.style.display = 'none';
+        showSection('loginSection'); // Show the login page
+    }
+}
+
+function logoutUser() {
+    localStorage.removeItem("username");
+    localStorage.removeItem("isAdminLoggedIn");
+    updateAuthButton(false, ''); // This will redirect to loginSection and hide nav
+    
+    // Simple visual feedback
+    const logo = document.querySelector('.logo');
+    logo.textContent = '👋 Logged Out';
+    setTimeout(() => {
+        logo.textContent = '🌿 Prakriti Analysis';
+    }, 2000);
+}
+
+// --- USER LOGIN ---
+function loginUser(){
+  const name=document.getElementById("loginName").value.trim();
+  const email=document.getElementById("loginEmail").value.trim();
+  const errorMessage = document.getElementById("user-error-message");
+
+  errorMessage.style.display = 'none'; // Clear previous error
+
+  if(name&&email){
+    localStorage.setItem("username",name);
+    localStorage.removeItem("isAdminLoggedIn"); // Ensure admin status is cleared
+    updateAuthButton(true, name, false); // Logged in as regular user
+    document.getElementById("loginName").value = ''; // Clear fields
+    document.getElementById("loginEmail").value = '';
+  }else { 
+    errorMessage.style.display = 'block'; // Show error
+  }
+}
+
+// --- ADMIN LOGIN ---
+function adminLoginUser(){
+    const name = document.getElementById("adminLoginName").value.trim();
+    const email = document.getElementById("adminLoginEmail").value.trim();
+    const errorMessage = document.getElementById("admin-error-message");
+
+    errorMessage.style.display = 'none'; // Clear previous error
+
+    if (name === ADMIN_CREDENTIALS.name && email === ADMIN_CREDENTIALS.email) {
+        localStorage.setItem("username", name);
+        localStorage.setItem("isAdminLoggedIn", "true");
+        updateAuthButton(true, name, true); // Logged in as admin
+        document.getElementById("adminLoginName").value = ''; // Clear fields
+        document.getElementById("adminLoginEmail").value = '';
+    } else {
+        errorMessage.style.display = 'block'; // Show error
+    }
+}
+
+const questionsData = [
+  { q: "1. What best describes your body type?", options: { vata: "Slim and light", pitta: "Medium and muscular", kapha: "Heavy and strong" } },
+  { q: "2. Your skin type?", options: { vata: "Dry, rough", pitta: "Sensitive, warm", kapha: "Smooth, oily" } },
+  { q: "3. Your hair type?", options: { vata: "Dry, frizzy", pitta: "Fine, early gray", kapha: "Thick, oily" } },
+  { q: "4. Your appetite?", options: { vata: "Irregular", pitta: "Strong", kapha: "Slow but steady" } },
+  { q: "5. Your sleep pattern?", options: { vata: "Light, disturbed", pitta: "Moderate", kapha: "Deep and long" } },
+  { q: "6. Your nature?", options: { vata: "Creative and quick", pitta: "Focused and intense", kapha: "Calm and patient" } },
+  { q: "7. Your energy level?", options: { vata: "Variable", pitta: "High", kapha: "Steady but slow" } },
+  { q: "8. Your reaction to stress?", options: { vata: "Anxiety and worry", pitta: "Anger and irritability", kapha: "Withdrawal and laziness" } },
+  { q: "9. How fast do you learn?", options: { vata: "Quick but forgets", pitta: "Balanced and sharp", kapha: "Slow but retains well" } },
+  { q: "10. Your walking style?", options: { vata: "Fast and light", pitta: "Medium and purposeful", kapha: "Slow and steady" } },
+  ];
+
+// Generate quiz
+const questionsDiv=document.getElementById("questions");
+questionsData.forEach((item,index)=>{
+  let html=`<h4>${item.q}</h4>`;
+  for(let key in item.options){
+    html+=`<label><input type="radio" name="q${index}" value="${key}" required> ${item.options[key]}</label><br>`;
+  }
+  questionsDiv.innerHTML+=html+"<br>";
+});
+
+function analyzePrakriti(){
+  const answers=document.querySelectorAll('input[type="radio"]:checked');
+  let score={vata:0,pitta:0,kapha:0};
+  const quizErrorMessage = document.getElementById("quiz-error-message");
+
+  quizErrorMessage.style.display = 'none'; // Clear previous error
+  
+  // Check if all questions are answered
+  if (answers.length !== questionsData.length) {
+    quizErrorMessage.style.display = 'block';
+    return;
+  }
+
+  answers.forEach(a=>score[a.value]++);
+  const prakriti=Object.keys(score).reduce((a,b)=>score[a]>score[b]?a:b);
+  
+  let resultText="", diet="", schedule="", doshaEmoji="";
+
+  if(prakriti==="vata"){
+    doshaEmoji="🌬️";
+    resultText="You are **Vata** — Creative, energetic, quick-minded. Your primary need is **grounding and warmth**.";
+    diet=`
+      <h3>🥗 Vata Diet: Warmth & Nourishment</h3>
+      <ul>
+        <li>Prioritize **warm, moist, and nourishing foods** (soups, stews, warm milk).</li>
+        <li>Include healthy fats like **Ghee** and avocados.</li>
+        <li>Favor sweet, sour, and salty tastes.</li>
+        <li>Avoid dry, cold, and raw foods (salads, cold drinks).</li>
+      </ul>
+    `;
+    schedule=`
+      <h3>🕰 Vata Routine: Stability & Rest</h3>
+      <ul>
+        <li>Maintain a **stable, regular daily routine** (Dinacharya).</li>
+        <li>Practice calming activities like gentle yoga and meditation.</li>
+        <li>Ensure you get early and sufficient sleep (by 10 PM).</li>
+      </ul>
+    `;
+  }
+  else if(prakriti==="pitta"){
+    doshaEmoji="🔥";
+    resultText="You are **Pitta** — Focused, intelligent, passionate. Your primary need is **cooling and moderation**.";
+    diet=`
+      <h3>🥗 Pitta Diet: Cool & Sweet</h3>
+      <ul>
+        <li>Favor **cool or room-temperature foods**; avoid excessively hot food.</li>
+        <li>Prioritize sweet, bitter, and astringent tastes.</li>
+        <li>Include lots of cooling vegetables like cucumber, zucchini, and cilantro.</li>
+        <li>Avoid excessive spice, sour foods, and fermented products.</li>
+      </ul>
+    `;
+    schedule=`
+      <h3>🕰 Pitta Routine: Calm & Balance</h3>
+      <ul>
+        <li>Engage in moderate, non-competitive exercise during cool times of the day.</li>
+        <li>Practice calm meditation and cooling breathing (Sitali Pranayama).</li>
+        <li>**Eat meals on time** to prevent irritability and acidity.</li>
+      </ul>
+    `;
+  }
+  else{ // Kapha
+    doshaEmoji="💧";
+    resultText="You are **Kapha** — Calm, loyal, but prone to accumulation. Your primary need is **lightness and stimulation**.";
+    diet=`
+      <h3>🥗 Kapha Diet: Light & Pungent</h3>
+      <ul>
+        <li>Prioritize **light, dry, and warm foods**.</li>
+        <li>Include pungent, bitter, and astringent tastes.</li>
+        <li>Use **spices** like ginger, cayenne, and black pepper liberally to stoke digestion.</li>
+        <li>Avoid heavy dairy, sweets, and excessive oils.</li>
+      </ul>
+    `;
+    schedule=`
+      <h3>🕰 Kapha Routine: Activity & Energy</h3>
+      <ul>
+        <li>Wake up **early** (before 6 AM) and engage in vigorous exercise.</li>
+        <li>Avoid daytime naps, which increase sluggishness.</li>
+        <li>Keep your mind stimulated with new challenges and activities.</li>
+      </ul>
+    `;
+  }
+
+  const name=localStorage.getItem("username")||"User";
+  document.getElementById("result").innerHTML=`
+    <h3 style="color:#2e7d32; font-size:1.5em;">Welcome, ${name}! Quiz Completed Successfully!</h3>
+    <p style="font-size:1.2em; font-weight:600; margin:10px 0;">${doshaEmoji} Your Dominant Prakriti is: ${prakriti.toUpperCase()} ${doshaEmoji}</p>
+    <p>${resultText}</p>
+    <button type="button" class="btn" onclick="goToProfile('${prakriti}Profile')">
+        View Detailed ${prakriti.toUpperCase()} Profile
+    </button>
+  `;
+  document.getElementById("dietResult").innerHTML = diet;
+  document.getElementById("scheduleResult").innerHTML = schedule;
+  showSection('resultSection');
+}
+
+// Check initial login state when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    const storedName = localStorage.getItem("username");
+    const isAdmin = localStorage.getItem("isAdminLoggedIn") === "true";
+
+    if (storedName) {
+        updateAuthButton(true, storedName, isAdmin);
+    } else {
+        updateAuthButton(false, '');
+    }
+});
+</script>
+</body>
+</html>
